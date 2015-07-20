@@ -1,0 +1,60 @@
+1)
+
+CREATE or REPLACE VIEW VW_INFO_CLIENTE
+       as SELECT customers.customer_id as codigo,
+                 customers.cust_first_name as nombres,
+                 customers.cust_last_name as apellidos,
+                 customers.credit_limit as credito,
+                 sum(orders.order_total) as Total
+       from customers,orders 
+       where orders.customer_id = customers.customer_id group by customers.customer_id ,customers.cust_first_name,customers.cust_last_name,customers.credit_limit;
+
+
+select * from VW_INFO_CLIENTE
+
+
+
+
+
+2)
+-- Created on 07/07/2015 by ESTUDIANTE 
+declare 
+  -- Local variables here
+  CURSOR c1 IS
+select  product_information.product_id as codigo, product_information.product_name as nombre, list_price as precio
+  from product_information
+  ;
+  v_numero_bodegas info_detalle_producto.numbero_bodegas%type:= 0;
+   v_CANTIDAD_STOCK info_detalle_producto.CANTIDAD_STOCK%type:= 0;
+   v_CANTIDAD_VENDIDO info_detalle_producto.CANTIDAD_VENDIDO%type:= 0;
+   v_TOTAL_VENDIDO info_detalle_producto.TOTAL_VENDIDO%type:= 0;
+begin 
+  delete from INFO_DETALLE_PRODUCTO;
+  for registro in c1 loop
+    select  count(quantity_on_hand)as enbodega into v_numero_bodegas from inventories where inventories.product_id=registro.codigo;
+    select  sum(quantity_on_hand)as totalbodegas into v_CANTIDAD_STOCK from inventories where inventories.product_id=registro.codigo;
+    select  count(unit_price)as canitadvendidoa into v_CANTIDAD_VENDIDO from order_items where order_items.product_id=registro.codigo;
+        if( v_CANTIDAD_STOCK IS NULL) then
+   v_CANTIDAD_STOCK:= 0;
+
+     end if;
+     if( v_CANTIDAD_VENDIDO IS NULL) then
+   v_CANTIDAD_VENDIDO:= 0;
+
+     end if;
+     
+    v_TOTAL_VENDIDO := v_CANTIDAD_VENDIDO * registro.precio;
+  
+          if( v_TOTAL_VENDIDO IS NULL) then
+   v_TOTAL_VENDIDO:= 0;
+
+     end if;
+    INSERT INTO INFO_DETALLE_PRODUCTO (PRODUCT_ID,DESC_PRODUCTO,NUMBERO_BODEGAS,CANTIDAD_STOCK ,CANTIDAD_VENDIDO,TOTAL_VENDIDO)
+VALUES (registro.codigo, registro.nombre,v_numero_bodegas , v_CANTIDAD_STOCK ,v_CANTIDAD_VENDIDO ,v_TOTAL_VENDIDO);
+-- VALUES (registro.codigo, registro.nombre,v_numero_bodegas , v_CANTIDAD_STOCK ,v_CANTIDAD_VENDIDO ,v_TOTAL_VENDIDO);
+  -- Test statements here
+     end loop;
+     COMMIT;
+end;
+
+select * from INFO_DETALLE_PRODUCTO

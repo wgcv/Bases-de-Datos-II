@@ -1,0 +1,54 @@
+create or replace view v1
+  as 
+select sum(quantity*unit_price) as cnt, order_items.product_id as ccodigo from order_items group by (order_items.product_id);
+declare 
+  -- Local variables here
+ CURSOR c1 IS
+select orders.customer_id as codigo, sum(orders.order_total)as total  from orders group by (orders.customer_id);
+
+    v_totalcompras number(10,2):=0;
+    v_customer_id number(6);
+    v_nombre customers.cust_first_name%type;
+    v_apellido customers.cust_last_name%type;
+    
+    CURSOR c2 IS
+select product_id as codigoproducto, sum(quantity)as cantidad  from order_items group by (product_id);
+    v_cantidadmax number(10):=0;
+    v_codigoproducto order_items.order_id%type;
+    v_nombreproducto product_information.product_name%type;
+    v_nnom product_information.product_name%type;
+  
+   CURSOR c4 IS
+select * from (select max(cnt)as maxo , ccodigo from v1  group by (ccodigo )) where ROWNUM <= 5;
+begin
+   for registro in c1 loop
+      if( registro.total >v_totalcompras) then
+   v_totalcompras:= registro.total;
+  v_customer_id:= registro.codigo;
+     end if;
+     
+
+   end loop;
+    select customers.cust_last_name into v_apellido from customers where customers.customer_id =v_customer_id;
+    select customers.cust_first_name into v_nombre from customers where customers.customer_id =v_customer_id;
+ 
+     DBMS_OUTPUT.put_line('El cliente que más ha comprado - Codigo: '|| v_customer_id || ' Nombre: '||v_nombre || ' Apellido: ' || v_apellido  || ' Total: $'|| v_totalcompras) ;
+
+   for registro in c2 loop
+      if( registro.cantidad >v_cantidadmax) then
+   v_cantidadmax:= registro.cantidad;
+  v_codigoproducto:= registro.codigoproducto;
+     end if;
+        end loop;
+        select product_information.product_name into v_nombreproducto from product_information where product_information.product_id =v_codigoproducto;
+     DBMS_OUTPUT.put_line('El producto que más ítems ha vendido - Codigo: '|| v_codigoproducto || ' Producto: '||v_nombreproducto ||  ' Cantidad: '|| v_cantidadmax) ;
+
+for registro in c4 loop
+     select product_information.product_name into v_nnom from product_information where product_information.product_id = registro.ccodigo;
+  
+ DBMS_OUTPUT.put_line(' los 5 producto que más  vendido - Codigo: '|| registro.ccodigo || ' Nombr: ' ||v_nnom || ' total: $'|| registro.maxo) ;
+
+
+        end loop;
+       
+end;

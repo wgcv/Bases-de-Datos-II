@@ -1,0 +1,13 @@
+-- Created on 25/06/2015 by ESTUDIANTE 
+declare 
+  -- Local variables here
+  V_SALARIO EMPLOYEES.SALARY%TYPE;
+  V_DAY VARCHAR2(50);
+begin
+  -- Test statements here
+    SELECT SALARY INTO V_SALARIO FROM EMPLOYEES WHERE EMPLOYEE_ID=200;
+    DBMS_OUTPUT.PUT_LINE('El salario es: '||V_SALARIO);
+    select TO_CHAR(SYSDATE, 'DD-MM-YYYY HH24:MI:SS') into V_DAY from dual;
+    DBMS_OUTPUT.PUT_LINE('La fecha es es: '||V_DAY);
+
+end;

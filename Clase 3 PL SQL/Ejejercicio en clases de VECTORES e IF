@@ -1,0 +1,39 @@
+-- Created on 30/06/2015 by W. Gustavo Cevallos
+/* Actulizar el salaro de los empleados de acuerdo al siguiete criterio si el salario actual del empleao esta en siguiente rango 
+Rango salario Porcentaje de aument
+1-2000 10%
+2001 - 5000 8%
+5001 10000 4%
+10001 2% */
+ 
+declare 
+  -- Local variables here
+  CURSOR c1 IS
+  select  EMPLOYEE_ID, SALARY from employees;
+  v_number number;
+  
+begin
+  -- Test statements here
+  for registro in c1 loop
+    if( registro.salary >0 AND registro.salary<=2000) then
+   UPDATE employees
+   SET SALARY=registro.salary * 1.10 
+    WHERE EMPLOYEE_ID=registro.EMPLOYEE_ID;
+    elsif ( registro.salary >2000 AND registro.salary<=5000) then
+      UPDATE employees
+   SET SALARY=registro.salary * 1.08 
+    WHERE EMPLOYEE_ID=registro.EMPLOYEE_ID;
+        elsif ( registro.salary >5000 AND registro.salary<=10000) then
+      UPDATE employees
+   SET SALARY=registro.salary * 1.04 
+    WHERE EMPLOYEE_ID=registro.EMPLOYEE_ID;
+     elsif ( registro.salary >10000) then
+      UPDATE employees
+   SET SALARY=registro.salary * 1.02
+    WHERE EMPLOYEE_ID=registro.EMPLOYEE_ID;
+    
+    end if;
+    end loop;
+    COMMIT;
+end;
+

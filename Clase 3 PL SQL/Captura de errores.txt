@@ -1,0 +1,20 @@
+DECLARE
+  V_EMP EMPLOYEES.EMPLOYEE_ID%TYPE;
+  V_SAL EMPLOYEES.SALARY%TYPE;
+  
+BEGIN
+  BEGIN
+    select employee_ID, SALARY
+    INTO V_EMP, V_SAL
+    FROM EMPLOYEES
+    where EMPLOYEE_ID=9999;
+    DBMS_OUTPUT.put_line(V_SAL);
+  EXCEPTION
+    when NO_DATA_FOUND THEN
+           DBMS_OUTPUT.put_line('No existe el registro '|| sqlerrm ||' '||  sqlcode);
+    when TOO_MANY_ROWS THEN
+           DBMS_OUTPUT.put_line('Mas de un registro '|| sqlerrm ||' '||  sqlcode);
+    when OTHERS then
+         DBMS_OUTPUT.put_line('Error Desconocido '|| sqlerrm ||' '||  sqlcode);
+  END;
+END;
